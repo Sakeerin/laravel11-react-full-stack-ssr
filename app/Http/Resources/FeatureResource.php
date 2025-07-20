@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class FeatureResource extends JsonResource
 {
+    public static $wrap = false;
     /**
      * Transform the resource into an array.
      *
@@ -18,7 +19,8 @@ class FeatureResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'user' => new UserResource($this->user),
+            // 'user' => new UserResource($this->user),
+            'user' => new $this->user,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'upvote_count' => $this->upvote_count ?: 0,
             'user_has_upvoted' => (bool)$this->user_has_upvoted,
