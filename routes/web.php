@@ -32,6 +32,9 @@ Route::middleware('auth')->group(function () {
         })->name('dashboard');
 
         Route::resource('feature', FeatureController::class);
+
+        Route::post('/feature/{feature}/upvote', [\App\Http\Controllers\UpvoteController::class, 'store'])->name('upvote.store');
+        Route::delete('/upvote/{feature}', [\App\Http\Controllers\UpvoteController::class, 'destroy'])->name('upvote.destroy');
         
     });
 });
