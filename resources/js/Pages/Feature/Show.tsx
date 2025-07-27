@@ -2,8 +2,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {Head} from '@inertiajs/react';
 import {Feature, Comment} from "@/types";
 import FeatureUpvoteDownvote from "@/Components/FeatureUpvoteDownvote";
-// import NewCommentForm from "@/Components/NewCommentForm";
-// import CommentItem from "@/Components/CommentItem";
+import NewCommentForm from "@/Components/NewCommentForm";
+import CommentItem from "@/Components/CommentItem";
 
 export default function Show({feature, comments}: {
   feature: Feature, comments: Comment[]
@@ -25,10 +25,10 @@ export default function Show({feature, comments}: {
             <h2 className="text-2xl mb-2">{feature.name}</h2>
             <p>{feature.description}</p>
             {comments && <div className="mt-8">
-              {/* <NewCommentForm feature={feature} />
+              <NewCommentForm feature={feature} />
               {comments.map(comment => (
                 <CommentItem comment={comment} key={comment.id} />
-              ))} */}
+              ))}
             </div>}
           </div>
         </div>
