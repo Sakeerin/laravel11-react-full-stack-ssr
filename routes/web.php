@@ -4,6 +4,7 @@ use App\Enum\PermissionsEnum;
 use App\Enum\RolesEnum;
 use App\Http\Controllers\FeatureController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,27 +29,44 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::middleware(['verified','role:'.RolesEnum::User->value])->group(function(){
-        Route::get('/dashboard', function () {
-            return Inertia::render('Dashboard');
-        })->name('dashboard');
+    
+    Route::middleware(['verified', 'role:' . RolesEnum::Admin->value])->group(function () {
+        Route::get('/user', [UserController::class, 'index'])
+            ->name('user.index');
+        Route::get('/user/{user}/edit', [UserController::class, 'edit'])
+            ->name('user.edit');
+        Route::put('/user/{user}', [UserController::class, 'update'])
+            ->name('user.update');
+    });
 
-        Route::resource('feature', FeatureController::class)
-            ->except(['index','show'])
-            ->middleware('can:'.PermissionsEnum::ManageFeatures->value);
+    Route::middleware([
+            'verified',
+            sprintf('role:%s|%s|%s',
+                RolesEnum::User->value,
+                RolesEnum::Commenter->value,
+                RolesEnum::Admin->value
+            )
+        ])->group(function(){
+            Route::get('/dashboard', function () {
+                return Inertia::render('Dashboard');
+            })->name('dashboard');
 
-        Route::get('/feature', [FeatureController::class, 'index'])->name('feature.index');
-        Route::get('/feature/{feature}', [FeatureController::class, 'show'])->name('feature.show');
+            Route::resource('feature', FeatureController::class)
+                ->except(['index','show'])
+                ->middleware('can:'.PermissionsEnum::ManageFeatures->value);
 
-        Route::post('/feature/{feature}/upvote', [\App\Http\Controllers\UpvoteController::class, 'store'])->name('upvote.store');
-        Route::delete('/upvote/{feature}', [\App\Http\Controllers\UpvoteController::class, 'destroy'])->name('upvote.destroy');
+            Route::get('/feature', [FeatureController::class, 'index'])->name('feature.index');
+            Route::get('/feature/{feature}', [FeatureController::class, 'show'])->name('feature.show');
 
-        Route::post('/feature/{feature}/comments', [\App\Http\Controllers\CommentController::class, 'store'])
-            ->name('comment.store')
-            ->middleware('can:'.PermissionsEnum::ManageComments->value);
-        Route::delete('/comment/{comment}', [\App\Http\Controllers\CommentController::class, 'destroy'])
-            ->name('comment.destroy')
-            ->middleware('can:'.PermissionsEnum::ManageComments->value);
+            Route::post('/feature/{feature}/upvote', [\App\Http\Controllers\UpvoteController::class, 'store'])->name('upvote.store');
+            Route::delete('/upvote/{feature}', [\App\Http\Controllers\UpvoteController::class, 'destroy'])->name('upvote.destroy');
+
+            Route::post('/feature/{feature}/comments', [\App\Http\Controllers\CommentController::class, 'store'])
+                ->name('comment.store')
+                ->middleware('can:'.PermissionsEnum::ManageComments->value);
+            Route::delete('/comment/{comment}', [\App\Http\Controllers\CommentController::class, 'destroy'])
+                ->name('comment.destroy')
+                ->middleware('can:'.PermissionsEnum::ManageComments->value);
         
     });
 });
